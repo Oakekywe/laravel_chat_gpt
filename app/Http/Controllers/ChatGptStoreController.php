@@ -37,8 +37,7 @@ class ChatGptStoreController extends Controller
             ]
         );
             
-    
 
-            return redirect()->route('chat.show', [$chat->id]);
+        return redirect()->route('chat.show', [$chat->id]);
     }
 }
