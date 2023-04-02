@@ -12,7 +12,7 @@
     <div class="w-full flex text-white">
       <template v-if="chat">
         <div class="w-full flex h-screen bg-slate-900">
-          <div class="w-full overflow-auto">
+          <div class="w-full overflow-auto pb-36" ref="chatContainer">
             <template v-for="(content, index) in chat ?.context" :key="index">
               <ChatContent class="py-3" :content="content"/>
             </template>
@@ -25,7 +25,9 @@
             <div class="w-full">
                 <div class="relative flex-1 flex items-center">
                     <input type="text" class="w-full bg-slate-700 text-white rounded-lg" 
-                    placeholder="Ask Laravel AI" v-model="form.promt" @keyup.enter="submit" :disabled="form.processing">
+                    placeholder="Ask Laravel AI" v-model="form.promt" @keyup.enter="submit" 
+                    :disabled="form.processing" ref="promtInput"
+                    >
                     <div @click="submit" class="cursor-pointer absolute inset-y-0 right-0 flex items-center pl-3">
                       <svg v-if="!form.processing"
                       xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" 
@@ -46,7 +48,11 @@
 <script setup>
 import ChatLayout from '@/Layouts/ChatLayout.vue';
 import { useForm, Link } from '@inertiajs/vue3';
-import ChatContent from '@/Components/ChatContent.vue'
+import ChatContent from '@/Components/ChatContent.vue';
+import { onMounted, ref } from 'vue';
+
+  const promtInput = ref(null);
+  const chatContainer = ref(null);
 
   const props= defineProps({
     messages:[],
@@ -61,6 +67,20 @@ import ChatContent from '@/Components/ChatContent.vue'
     const url = props.chat ? `/chat/${props.chat?.id}` : "/chat";
     form.post(url);
   }
+
+  const scrollToBottom = ()=>{
+    const el = chatContainer.value;
+    el.scrollTop= el.scrollHeight;
+  }
+
+  const clear= ()=>{
+    form.promt = "";
+    promtInput.value.focus();
+    scrollToBottom();
+  }
+  onMounted(()=>{
+    clear();
+  })
 
 </script>
 <style>
