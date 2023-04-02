@@ -2,9 +2,15 @@
   <ChatLayout>
     <template #aside>
       <ul class="p-2">
+        <li class="cursor-pointer px-4 py-2 my-2 flex justify-between font-semibold text-green-400 bg-slate-900 hover:bg-slate-700 rounded-lg duration-200">
+            <Link class="w-full" href="/chat">New Chat</Link>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </li>
         <template v-for="message in messages" :key="message.id">
           <li class="cursor-pointer px-4 py-2 my-2 flex justify-between font-semibold text-slate-400 bg-slate-900 hover:bg-slate-700 rounded-lg duration-200">
-            <Link :href="`/chat/${message.id}`"> {{message.context[0].content}}</Link>
+            <Link class="w-full" :href="`/chat/${message.id}`"> {{message.context[0].content}}</Link>
           </li>
         </template>
       </ul>
@@ -16,6 +22,7 @@
             <template v-for="(content, index) in chat ?.context" :key="index">
               <ChatContent class="py-3" :content="content"/>
             </template>
+            <Skeleton v-show="form.processing" />
           </div>
         </div>
       </template>
@@ -49,6 +56,7 @@
 import ChatLayout from '@/Layouts/ChatLayout.vue';
 import { useForm, Link } from '@inertiajs/vue3';
 import ChatContent from '@/Components/ChatContent.vue';
+import Skeleton from '@/Components/Skeleton.vue';
 import { onMounted, ref } from 'vue';
 
   const promtInput = ref(null);
@@ -65,12 +73,16 @@ import { onMounted, ref } from 'vue';
 
   const submit = ()=>{
     const url = props.chat ? `/chat/${props.chat?.id}` : "/chat";
-    form.post(url);
+    form.post(url, {
+      onFinish: ()=> clear()
+    });
   }
 
   const scrollToBottom = ()=>{
-    const el = chatContainer.value;
-    el.scrollTop= el.scrollHeight;
+    if(props.chat){
+      const el = chatContainer.value;
+      el.scrollTop= el.scrollHeight;
+    }
   }
 
   const clear= ()=>{
